@@ -32,24 +32,12 @@ class Backend {
   getDeck() {
     return this.hand.deck;
   }
-  async getCard() {
+  async getCard(index: number) {
     return new Promise((resolve) => {
       const time = Math.floor(Math.random() * (100 - 50 + 1) + 50)
 
       setTimeout(() => {
-        for (let i = 0; i < 10; i++) {
-          let minIndex = 0;
-          let minCard = this.hand.deck[0];
-
-          for (let j = 1; j < this.hand.deck.length; j++) {
-            if (this.hand.deck[j] < minCard) {
-              minIndex = j;
-              minCard = this.hand.deck[j];
-            }
-          }
-
-          resolve(this.hand.deck.splice(minIndex, 1)[0]);
-        }
+        resolve(this.hand.deck[index]);
       }, time);
     });
   }
@@ -64,8 +52,12 @@ class Frontend {
 
     const promises = []
 
-    for (let i = 0; i < 10; i++) {
-      const promise = this.backend.getCard()
+    const randomSlotPosition = Hand.shuffler([
+      2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+    ]);
+
+    for (let i = 0; i < randomSlotPosition.length; i++) {
+      const promise = this.backend.getCard(randomSlotPosition[i])
       
       promises.push(promise)
     }
@@ -78,11 +70,9 @@ class Frontend {
       isSorted: this.isSorted(hand)
     }
   }
-
   isSorted(cards: number[]) {
     return cards.every((val, i, arr) => i === 0 || val >= arr[i - 1]);
   }
-
   caclculateSuccessRate(results) {
     let successCount = 0;
 
@@ -110,7 +100,7 @@ class Frontend {
         throw new Error(`Hand ${i + 1} took ${responseTime}ms to complete. Deck: ${response.deck.join(', ')}. Hand: ${response.hand.join(', ')}. Is sorted: ${response.isSorted}`)
       }
 
-      times.push(responseTime)
+      times.push(responseTime);
       results.push(results)
 
       console.log(`Dealt hand ${i + 1} in ${responseTime}ms. Deck: ${response.deck.join(', ')}. Hand: ${response.hand.join(', ')}. Is sorted: ${response.isSorted}`)
