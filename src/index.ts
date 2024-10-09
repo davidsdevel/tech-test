@@ -1,18 +1,21 @@
 
 class Hand {
   public deck: number[] = [];
+  static shuffler(data: number[]) {
+    for (let i = 0; i < data.length - 1; i++) {
+      let r = i + (Math.floor(Math.random() * (data.length - i)));
+      let tmp = data[i];
+      data[i] = data[r];
+      data[r] = tmp;
+    }
+
+    return data
+  }
   
   shuffle() {
-    const deck = [
+    const deck = Hand.shuffler([
       0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
-    ]
-
-    for (let i = 0; i < deck.length - 1; i++) {
-      let r = i + (Math.floor(Math.random() * (deck.length - i)));
-      let tmp = deck[i];
-      deck[i] = deck[r];
-      deck[r] = tmp;
-    }
+    ]);
 
     this.deck = deck;
   }
@@ -81,7 +84,7 @@ class Frontend {
   async play() {
     const times = []
     const results = []
-    
+
     for (let i = 0; i < this.numHands; i++) {
       const startTime = Date.now();
       const response = await this.playHand();
